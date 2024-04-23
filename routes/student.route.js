@@ -13,7 +13,7 @@ router.get("/", getStudents);
 
 router.post("/", createStudent);
 
-router.put("/:id", updateStudent);
+router.patch("/:id", updateStudent);
 
 router.delete("/:id", deleteStudent);
 
