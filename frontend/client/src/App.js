@@ -2,7 +2,7 @@ import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Table, Row, Button } from "react-bootstrap";
+import { Table, Row, Button, Form, Col } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -10,6 +10,10 @@ function App() {
   const [fullData, setFullData] = useState([]);
   const [sid, setSid] = useState(null);
   const [sid2, setSid2] = useState([]);
+
+  const [name, setName] = useState("");
+  const [age, setAge] = useState("");
+  const [mark, setMark] = useState("");
 
   useEffect(() => {
     axios
@@ -19,12 +23,12 @@ function App() {
   }, []);
 
   //insert
-  const creteData = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     let patchData = {
-      mark: 400,
-      name: "gamer",
-      age: 22,
+      name: name,
+      age: age,
+      mark: mark,
     };
     axios
       .post(`http://localhost:4000/api/students/`, patchData)
@@ -64,23 +68,29 @@ function App() {
   // console.log(sid2);
   const handleUpdate = (id) => {
     let patchData = {
-      mark: 700,
+      name: name,
+      age: age,
+      mark: mark,
     };
-    axios
-      .patch(`http://localhost:4000/api/students/${id}`, patchData)
-      .then((res) => {
-        console.log(res.data);
-        toast.success("Updated !", {
-          position: "top-right",
-          theme: "colored",
+    if (name && age && mark) {
+      axios
+        .patch(`http://localhost:4000/api/students/${id}`, patchData)
+        .then((res) => {
+          console.log(res.data);
+          toast.success("Updated !", {
+            position: "top-right",
+            theme: "colored",
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          alert("failed");
         });
-      })
-      .catch((err) => {
-        console.log(err);
-        alert("failed");
-      });
-    // Implement update logic here
-    console.log("Updating student with ID:", id);
+      // Implement update logic here
+      console.log("Updating student with ID:", id);
+    } else {
+      toast.warning("Please fill all fiedls");
+    }
   };
 
   //get 1 user
@@ -94,8 +104,45 @@ function App() {
       .catch((err) => console.log(err));
   };
   return (
-    <div className="App">
-      <div className="border">
+    <div className="p-3 h-100">
+      <Row className="d-flex justify-content-center">CRUD-APPLICATION</Row>
+      <Row className="mt-5">
+        <Form className="" onSubmit={handleSubmit}>
+          <Row className="">
+            <Col sx={3}>
+              <Form.Control
+                required
+                type="text"
+                placeholder="Name"
+                onChange={(e) => setName(e.target.value)}
+              />
+            </Col>
+            <Col sx={3}>
+              <Form.Control
+                required
+                type="number"
+                placeholder="Age"
+                onChange={(e) => setAge(e.target.value)}
+              />
+            </Col>
+            <Col sx={3}>
+              <Form.Control
+                required
+                type="number"
+                placeholder="Mark"
+                onChange={(e) => setMark(e.target.value)}
+              />
+            </Col>
+            <Col sx={3}>
+              <Button type="submit" className="bg-success border-0 shadow ">
+                create
+              </Button>
+              <ToastContainer />{" "}
+            </Col>
+          </Row>
+        </Form>
+      </Row>
+      <Row className="mt-3 p-3">
         <Table striped bordered hover>
           <thead>
             <tr>
@@ -115,7 +162,8 @@ function App() {
                 <td>
                   <Button
                     onClick={() => handleDelete(student._id)}
-                    className="bg-danger shadow border-0"
+                    className="bg-danger shadow border-0 "
+                    size="sm"
                   >
                     Delete
                   </Button>
@@ -125,7 +173,9 @@ function App() {
                   <Button
                     onClick={() => handleUpdate(student._id)}
                     className="bg-warning border-0 shadow"
+                    size="sm"
                   >
+                    <i className=""></i>
                     Update
                   </Button>
                   <ToastContainer />
@@ -134,25 +184,7 @@ function App() {
             ))}
           </tbody>
         </Table>
-      </div>
-
-      <Row>
-        <Button
-          onClick={(e) => creteData(e)}
-          className="bg-success border-0 shadow"
-        >
-          create
-        </Button>
-        <ToastContainer />
       </Row>
-      {/* 
-      <input
-        type="text"
-        placeholder="Enter"
-        onChange={(e) => setSid(e.target.value)}
-      ></input>
-      <button onClick={handleData}>submit</button>
-      {sid2 && <label>{sid2}</label>} */}
     </div>
   );
 }
